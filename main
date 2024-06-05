@@ -24,12 +24,25 @@
 			border: 2px solid black;
 			background-color: yellow;
 		}
+		.mensagem-fim-de-jogo {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			font-size: 32px;
+			color: red;
+			background-color: black;
+			padding: 20px;
+			border-radius: 10px;
+			display: none; 
+		}
 	</style>
 </head>
 <body>
 	<audio src="mario.mp3" autoplay>
         <p>Seu Browser nao consegue reproduzir a tag audio</p>
     </audio>
+
 	<div class="painel">
 		<p>Pontuação: <span id="pontuacao">0</span></p>
 		<p>Linhas: <span id="linhas">0</span></p>
@@ -37,6 +50,7 @@
 </body>
 </html>
 <canvas id="tela" width="240" height="480"></canvas>
+<div class="mensagem-fim-de-jogo" id="mensagem-fim-de-jogo">Fim de Jogo</div>
 <script>
 /*
    Jogo: Tetris
@@ -372,7 +386,7 @@ function travarPeca(){
             }
 
             if (peca.y + i < 0) {
-                alert("Fim de Jogo");
+                exibirFimDeJogo();
                 fimDeJogo = true;
                 break;
             }
@@ -441,5 +455,17 @@ function controlarPeca(evento){
         moverAbaixo();
     }
 }
-</script>
 
+function exibirFimDeJogo() {
+	document.getElementById("mensagem-fim-de-jogo").style.display = "block";
+}
+
+function finalizarJogo() {
+	fimdejogo = true;
+	exibirFimDeJogo();
+}
+
+if(fimDeJogo) {
+	finalizarJogo();
+}
+</script>
