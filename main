@@ -16,13 +16,21 @@
 		#tela {
 			border: 2px solid black;
 		}
-		.painel {
+		.painelEsquerdo {
 			position: absolute;
 			top: 20px;
 			left: 20px;
 			padding: 20px;
 			border: 2px solid black;
 			background-color: yellow;
+		}
+		.painelDireito {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			padding: 20px;
+			border: 2px solid black;
+			background-color: blue;
 		}
 		.mensagem-fim-de-jogo {
 			position: absolute;
@@ -43,9 +51,14 @@
         <p>Seu Browser nao consegue reproduzir a tag audio</p>
     </audio>
 
-	<div class="painel">
+	<div class="painelEsquerdo">
+		<p>Nivel: <span id="niveis">1</span></p>
 		<p>Pontuação: <span id="pontuacao">0</span></p>
 		<p>Linhas: <span id="linhas">0</span></p>
+	</div>
+
+	<div class="painelDireito">
+		<p>Próxima peça: <span id="peça"></span></p>
 	</div>
 </body>
 </html>
@@ -232,6 +245,11 @@ var tabuleiro = [];
 var inicioDescida;
 var fimDeJogo = false;
 
+let niveis = 1;
+let linhasRemovidas = 0;
+let pontuacao = 0;
+
+
 var tela = document.getElementById("tela");
 var c = tela.getContext("2d");
 
@@ -246,7 +264,6 @@ gerarPeca();
 inicioDescida = Date.now();
 
 descerPeca();
-
 
 // Sub-rotinas (funções)
 
@@ -403,6 +420,11 @@ function travarPeca(){
         }
 		
         if (linhaCheia) {
+			linhasRemovidas++;
+			adicionarPontos();
+			nivel = Math.floor(linhasRemovidas / 10) + 1;
+			pontuacao *= nivel;
+			atualizarPainel();
             for (var y = i; y > 1; y--) {
                 for (var j = 0; j < COLUNA; j++) {
                     tabuleiro[y][j] = tabuleiro[y-1][j];
@@ -467,5 +489,26 @@ function finalizarJogo() {
 
 if(fimDeJogo) {
 	finalizarJogo();
+}
+
+function atualizarPainel() {
+	document.getElementById("niveis").innerText = nivel;
+	document.getElementById("linhas").innerText = linhasRemovidas;	
+}
+
+function adicionarPontos() {
+	if(linhasRemovidas == 1) {
+		pontuacao += 100;
+	}
+	if(linhasRemovidas == 2) {
+		pontuacao += 300;
+	}
+	if(linhasRemovidas == 3) {
+		pontuacao += 500;
+	}
+	if(linhasRemovidas == 4) {
+		pontuacao += 800;
+	}
+	document.getElementById("pontuacao").innerText = pontuacao;
 }
 </script>
