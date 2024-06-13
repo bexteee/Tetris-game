@@ -1,68 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Tetris</title>
-	<style>
-		body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: rgb(0, 255, 72);
-        }
-		#tela {
-			border: 2px solid black;
-		}
-		.painelEsquerdo {
-			position: absolute;
-			top: 20px;
-			left: 20px;
-			padding: 20px;
-			border: 2px solid black;
-			background-color: yellow;
-		}
-		.painelDireito {
-			position: absolute;
-			top: 20px;
-			right: 20px;
-			padding: 20px;
-			border: 2px solid black;
-			background-color: blue;
-		}
-		.mensagem-fim-de-jogo {
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			font-size: 32px;
-			color: red;
-			background-color: black;
-			padding: 20px;
-			border-radius: 10px;
-			display: none; 
-		}
-	</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tetris</title>
+<style>
+	body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: rgb(0, 255, 72);
+}
+	#tela {
+		border: 2px solid black;
+	}
+	.painelEsquerdo {
+		position: absolute;
+		top: 20px;
+		left: 20px;
+		padding: 20px;
+		border: 2px solid black;
+		background-color: yellow;
+	}
+	
+	.mensagem-fim-de-jogo {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-size: 32px;
+		color: red;
+		background-color: black;
+		padding: 20px;
+		border-radius: 10px;
+		display: none; 
+	}
+	.painelRanking {
+		position: absolute;
+		bottom: 20px;
+		right: 20px;
+		padding: 20px;
+		border: 2px solid black;
+		background-color: white;
+		width: 300px;
+		text-align: center;
+	}
+	.painelRanking table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	.painelRanking th, .painelRanking td {
+		border: 1px solid black;
+		padding: 8px;
+	}
+</style>
 </head>
 <body>
-	<audio autoplay="autoplay">
-		<source src="mario.mp3" type="audio/mp3">
-        <p>Seu Browser nao consegue reproduzir a tag audio</p>
-    </audio>
+<audio autoplay="autoplay">
+	<source src="mario.mp3" type="audio/mp3">
+<p>Seu Browser nao consegue reproduzir a tag audio</p>
+</audio>
 
-	<div class="painelEsquerdo">
-		<p>Nivel: <span id="niveis">1</span></p>
-		<p>Pontuação: <span id="pontuacao">0</span></p>
-		<p>Linhas: <span id="linhas">0</span></p>
-	</div>
+<div class="painelEsquerdo">
+	<p>Nivel: <span id="niveis">1</span></p>
+	<p>Pontuação: <span id="pontuacao">0</span></p>
+	<p>Linhas: <span id="linhas">0</span></p>
+</div>
 
-	<div class="painelDireito">
-		<p>Próxima peça: <span id="peça"></span></p>
-	</div>
-	<canvas id="tela" width="240" height="480"></canvas>
-	<script src="Tetris.js"></script>
+<div class="painelRanking">
+	<h3>Ranking</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>Posição</th>
+				<th>Nome</th>
+				<th>Pontuação</th>
+			</tr>
+		</thead>
+		<tbody id="ranking-body">
+
+		</tbody>
+	</table>
+</div>
+
+<canvas id="tela" width="240" height="480"></canvas>
+<script src="Tetris.js"></script>
 </body>
 </html>
 <div class="mensagem-fim-de-jogo" id="mensagem-fim-de-jogo">Fim de Jogo</div>
@@ -246,7 +270,7 @@ var peca;
 var tabuleiro = [];
 
 var inicioDescida;
-var fimDeJogo = true;
+var fimDeJogo = false;
 
 let niveis = 1;
 let linhasRemovidas = 0;
@@ -315,7 +339,7 @@ function descerPeca(){
     var agora = Date.now();
     var delta = agora - inicioDescida;
 	
-    if (delta > 100) {
+    if (delta > 1000) {
         moverAbaixo();
         inicioDescida = Date.now();
     }
@@ -470,13 +494,13 @@ function controlarPeca(evento){
     if (tecla == 37) {
         moverEsquerda();
         inicioDescida = Date.now();
-    } else if (tecla == 38) {
+    } else if (tecla == 90) {
         rodarPeca();
         inicioDescida = Date.now();
     } else if (tecla == 39) {
         moverDireita();
         inicioDescida = Date.now();
-    } else if (tecla == 40) {
+    } else if (tecla == 32) {
         moverAbaixo();
     }
 }
@@ -510,9 +534,35 @@ function adicionarPontos(linhasParaRemover) {
 			pontuacao += 500;
 			break;
 		case 4: 
-		pontuacao += 800;
-		break;
+			pontuacao += 800;
+			break;
 	}
 	document.getElementById("pontuacao").innerText = pontuacao;
 	document.getElementById("linhas").innerText = linhasRemovidas;	
+}
+
+function ordenarRanking(ranking) {
+    let n = ranking.length;
+    for(let j = 0; j < n - 1; j++) {
+        for(let i = 0; i < n - 1 - j; i++) {
+            if(ranking[j].pontos < ranking[j + 1].pontos) {
+                let aux = ranking[j];
+                ranking[j] = ranking[j + 1];
+                ranking[j + 1] = aux;
+            }
+        }
+    }
+    return ranking;
+}
+
+function salvarPontuacao() {
+    let nome = prompt('Digite seu nome: ');
+    if(nome) {
+        let ranking = [];
+        ranking = JSON.parse(localStorage.getItem("ranking"));
+        ranking.push({ nome: nome, pontos: pontos });
+        ranking = ranking(ordenarRanking);
+        localStorage.setItem("ranking", JSON.stringify(ranking));
+        exibirRanking();
+    }
 }
